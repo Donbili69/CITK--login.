@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Neural Translate Pro - Sticker Edition</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-color: #080c14;
+            --glass-bg: rgba(15, 23, 42, 0.85);
+            --neon-purple: #bc13fe;
+            --neon-cyan: #00f2fe;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(circle at 20% 20%, rgba(188, 19, 254, 0.15), transparent 35%),
+                radial-gradient(circle at 80% 80%, rgba(0, 242, 254, 0.15), transparent 35%);
+            height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; color: white; overflow: hidden;
+        }
+
+        /* --- STICKERS --- */
+        .sticker {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.2);
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 1; pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+        .sticker i { font-size: 24px; margin-bottom: 5px; color: var(--neon-cyan); }
+        .sticker span { font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
+
+        .s1 { top: 10%; left: 10%; transform: rotate(-12deg); }
+        .s2 { bottom: 15%; right: 10%; transform: rotate(8deg); animation-delay: -3s; }
+        .s3 { top: 15%; right: 15%; transform: rotate(15deg); animation-delay: -1.5s; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(-10deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* --- MAIN UI --- */
+        .main-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(25px);
+            width: 90%; max-width: 850px;
+            border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.1);
+            padding: 40px; position: relative; z-index: 10;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+        }
+
+        header h1 { text-align: center; margin: 0 0 30px; font-size: 28px; letter-spacing: 4px; background: linear-gradient(to right, #fff, var(--neon-cyan)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+
+        .box { 
+            background: rgba(0, 0, 0, 0.4); border-radius: 25px; padding: 25px; 
+            position: relative; border: 1px solid rgba(255,255,255,0.05); transition: 0.3s;
+        }
+        .box:focus-within { border-color: var(--neon-cyan); box-shadow: 0 0 15px rgba(0, 242, 254, 0.3); }
+
+        textarea { width: 100%; background: transparent; border: none; outline: none; color: #fff; font-size: 18px; height: 120px; resize: none; font-family: inherit; }
+
+        .icon-btn { 
+            background: rgba(255,255,255,0.08); border: none; color: white; width: 44px; height: 44px; 
+            border-radius: 50%; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center;
+        }
+        .icon-btn:hover { background: var(--neon-purple); transform: scale(1.1); box-shadow: 0 0 15px var(--neon-purple); }
+        
+        #micBtn.active { background: #ff4b2b; animation: pulse 1s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.1); } 100% { transform: scale(1); } }
+
+        .footer { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
+        select { background: #111; color: white; border: 1px solid #333; padding: 12px 20px; border-radius: 50px; outline: none; cursor: pointer; }
+    </style>
+</head>
+<body>
+
+    <div class="sticker s1"><i class="fa-solid fa-brain"></i><span>Neural Engine</span></div>
+    <div class="sticker s2"><i class="fa-solid fa-earth-americas"></i><span>Global Sync</span></div>
+    <div class="sticker s3"><i class="fa-solid fa-bolt-lightning"></i><span>Instant</span></div>
+
+    <div class="main-card">
+        <header><h1>NEURAL TRANSLATE</h1></header>
+
+        <div class="grid">
+            <div class="box">
+                <textarea id="inputText" placeholder="Type or speak..." oninput="handleInput()"></textarea>
+                <div style="position:absolute; bottom:15px; right:15px; display:flex; gap:8px;">
+                    <button class="icon-btn" id="micBtn" onclick="toggleMic()"><i class="fa-solid fa-microphone"></i></button>
+                    <button class="icon-btn" onclick="speak('inputText', 'en-US')"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+            </div>
+
+            <div class="box" style="background: rgba(0,0,0,0.6);">
+                <textarea id="outputText" placeholder="..." readonly></textarea>
+                <div style="position:absolute; bottom:15px; right:15px; display:flex; gap:8px;">
+                    <button class="icon-btn" onclick="copyText()"><i class="fa-solid fa-copy"></i></button>
+                    <button class="icon-btn" onclick="speakOutput()"><i class="fa-solid fa-volume-high"></i></button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <select id="langPair" onchange="translateText()">
+                <option value="en|hi">Hindi (हिन्दी)</option>
+                <option value="en|ja">Japanese (日本語)</option>
+                <option value="en|es">Spanish (Español)</option>
+                <option value="en|fr">French (Français)</option>
+                <option value="es|en">Spanish to English</option>
+            </select>
+            <div id="status" style="font-size: 11px; color: #666; font-weight: 600;">STATUS: IDLE</div>
+        </div>
+    </div>
+
+    <script>
+        let typingTimer;
+        
+        function handleInput() {
+            clearTimeout(typingTimer);
+            document.getElementById("status").innerText = "STATUS: PROCESSING...";
+            typingTimer = setTimeout(translateText, 700);
+        }
+
+        async function translateText() {
+            const text = document.getElementById("inputText").value;
+            const pair = document.getElementById("langPair").value;
+            if(!text) { document.getElementById("outputText").value = ""; return; }
+
+            try {
+                const res = await fetch(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${pair}`);
+                const data = await res.json();
+                document.getElementById("outputText").value = data.responseData.translatedText;
+                document.getElementById("status").innerText = "STATUS: SYNCED";
+            } catch(e) { document.getElementById("status").innerText = "STATUS: ERROR"; }
+        }
+
+        // --- AUDIO ENGINE ---
+        function speak(elementId, langCode) {
+            const text = document.getElementById(elementId).value;
+            if(!text) return;
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.lang = langCode;
+            
+            // Fix for specific voices
+            const voices = window.speechSynthesis.getVoices();
+            const voice = voices.find(v => v.lang.includes(langCode.split('-')[0]));
+            if(voice) utterance.voice = voice;
+            
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function speakOutput() {
+            const langMap = { 'hi':'hi-IN', 'ja':'ja-JP', 'es':'es-ES', 'fr':'fr-FR', 'en':'en-US' };
+            const target = document.getElementById("langPair").value.split('|')[1];
+            speak('outputText', langMap[target] || 'en-US');
+        }
+
+        // --- VOICE INPUT ---
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.onresult = (e) => {
+            document.getElementById("inputText").value = e.results[0][0].transcript;
+            handleInput();
+        };
+        recognition.onend = () => document.getElementById("micBtn").classList.remove("active");
+
+        function toggleMic() {
+            document.getElementById("micBtn").classList.add("active");
+            recognition.start();
+        }
+
+        function copyText() {
+            navigator.clipboard.writeText(document.getElementById("outputText").value);
+            document.getElementById("status").innerText = "STATUS: COPIED!";
+            setTimeout(() => document.getElementById("status").innerText = "STATUS: READY", 1500);
+        }
+    </script>
+</body>
+</html>
