@@ -113,6 +113,9 @@
 
         <div class="footer">
             <select id="langPair" onchange="translateText()">
+                <option value="en|as">Assamese (অসমীয়া)</option>
+                <option value="en|bn">Bengali (বাংলা)</option>
+                <option value="en|brx">Bodo (बर'/बड़ो)</option>
                 <option value="en|hi">Hindi (हिन्दी)</option>
                 <option value="en|ja">Japanese (日本語)</option>
                 <option value="en|es">Spanish (Español)</option>
@@ -162,8 +165,19 @@
         }
 
         function speakOutput() {
-            const langMap = { 'hi':'hi-IN', 'ja':'ja-JP', 'es':'es-ES', 'fr':'fr-FR', 'en':'en-US' };
+            // UPDATED LANGUAGE MAP
+            const langMap = { 
+                'hi':'hi-IN', 
+                'ja':'ja-JP', 
+                'es':'es-ES', 
+                'fr':'fr-FR', 
+                'en':'en-US',
+                'as':'as-IN',   // Assamese
+                'bn':'bn-IN',   // Bengali
+                'brx':'brx-IN'  // Bodo
+            };
             const target = document.getElementById("langPair").value.split('|')[1];
+            // Uses fallback if specific voice isn't found
             speak('outputText', langMap[target] || 'en-US');
         }
 
